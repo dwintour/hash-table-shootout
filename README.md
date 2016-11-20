@@ -36,8 +36,8 @@ No copyright.  This work is dedicated to the public domain.
 For full details, see http://creativecommons.org/publicdomain/zero/1.0/
 
 
-From Aggregate Knowledge - https://github.com/aggregateknowledge
-================================================================
+From https://github.com/aggregateknowledge
+==========================================
 
 I ran this on an Amazon EC2 `m2.4xlarge` instance with the Red Hat 6.1 x86\_64 AMI (`ami-31d41658`).
 
