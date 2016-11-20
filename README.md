@@ -1,6 +1,8 @@
 How to run these benchmarks
 ===========================
 
+These bencharks were run on linux (in my case I used a Vagrant VM - box 'ubuntu/trusty64'.
+
 You'll need to install the packages you want to test, and to update the Makefile 
 so that the headers are found.
 
