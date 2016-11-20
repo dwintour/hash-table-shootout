@@ -5,4 +5,4 @@
 #define DELETE_INT_FROM_HASH(key) g_hash_table_remove(hash, GINT_TO_POINTER(key))
 #define INSERT_STR_INTO_HASH(key, value) g_hash_table_insert(str_hash, key, &value)
 #define DELETE_STR_FROM_HASH(key) g_hash_table_remove(str_hash, key)
-#include "template.c"
+#include "template.cc"

@@ -1,8 +1,9 @@
 #include <inttypes.h>
-#include <boost/unordered_map.hpp>
-typedef boost::unordered_map<int64_t, int64_t> hash_t;
-typedef boost::unordered_map<const char *, int64_t> str_hash_t;
-#define SETUP hash_t hash; str_hash_t str_hash;
+#include "sparsepp.h"
+typedef spp::sparse_hash_map<int64_t, int64_t> hash_t;
+typedef spp::sparse_hash_map<const char *, int64_t> str_hash_t;
+#define SETUP hash_t hash; hash.set_deleted_key(-1); \
+              str_hash_t str_hash; str_hash.set_deleted_key("");
 #define INSERT_INT_INTO_HASH(key, value) hash.insert(hash_t::value_type(key, value))
 #define DELETE_INT_FROM_HASH(key) hash.erase(key)
 #define PRESENT(key) (hash.find(key) != hash.end())

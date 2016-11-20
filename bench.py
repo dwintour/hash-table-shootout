@@ -1,20 +1,31 @@
 import sys, os, subprocess, signal
 
 programs = [
-    'glib_hash_table',
     'stl_unordered_map',
     'boost_unordered_map',
     'google_sparse_hash_map',
     'google_dense_hash_map',
-    'qt_qhash',
-    'python_dict',
+    'sparsepp',
+    'btree'
 ]
 
-# for the final run, use this:
-minkeys  =  0*1000*1000
-maxkeys  = 1500*1000*1000
-interval = 100*1000*1000
-best_out_of = 3
+test_size   = 1
+minkeys     = 0
+maxkeys     = 1000
+interval    = 100
+best_out_of = 1
+
+if test_size == 2:
+    multiplier = 1000 * 1000
+    maxkeys  = 500
+    best_out_of = 3
+    
+elif test_size == 1:
+    multiplier = 100 * 1000
+    interval = 200
+else:
+    multiplier = 10 * 1000
+
 # and use nice/ionice
 # and shut down to the console
 # and swapoff any swap files/partitions
@@ -24,11 +35,12 @@ outfile = open('output', 'w')
 if len(sys.argv) > 1:
     benchtypes = sys.argv[1:]
 else:
-    benchtypes = ('random', )
+    benchtypes = ( 'random', 'lookup', 'delete',)
+    #benchtypes = (  'lookup', )
 
 for benchtype in benchtypes:
-    nkeys = minkeys
-    while nkeys <= maxkeys:
+    nkeys = minkeys * multiplier
+    while nkeys <= (maxkeys * multiplier):
         for program in programs:
             fastest_attempt = 1000000
             fastest_attempt_data = ''
@@ -60,4 +72,4 @@ for benchtype in benchtypes:
                 print >> outfile, fastest_attempt_data
                 print fastest_attempt_data
 
-        nkeys += interval
+        nkeys += interval * multiplier

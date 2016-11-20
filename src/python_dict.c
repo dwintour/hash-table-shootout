@@ -18,4 +18,4 @@ typedef PyObject * hash_t;
 #define DELETE_STR_FROM_HASH(key) do { \
         PyDict_DelItemString(hash, key); \
     } while(0)
-#include "template.c"
+#include "template.cc"

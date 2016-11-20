@@ -26,6 +26,7 @@ import sys, json
 lines = [ line.strip() for line in sys.stdin if line.strip() ]
 
 by_benchtype = {}
+benches = {}
 
 for line in lines:
     benchtype, nkeys, program, nbytes, runtime = line.split(',')
@@ -35,29 +36,53 @@ for line in lines:
 
     by_benchtype.setdefault("%s-runtime" % benchtype, {}).setdefault(program, []).append([nkeys, runtime])
     by_benchtype.setdefault("%s-memory"  % benchtype, {}).setdefault(program, []).append([nkeys, nbytes])
+    benches[benchtype] = 1
 
 proper_names = {
-    'boost_unordered_map': 'Boost 1.41 unordered_map',
-    'stl_unordered_map': 'GCC 4.4 std::unordered_map',
-    'google_sparse_hash_map': 'Google sparsehash 1.11 sparse_hash_map',
-    'google_dense_hash_map': 'Google sparsehash 1.11 dense_hash_map',
-    'glib_hash_table': 'Glib 2.22 GHashTable',
-    'qt_qhash': 'Qt 4.6 QHash',
-    'python_dict': 'Python 2.6 (C API) dict',
-    'ruby_hash': 'Ruby Placeholder'
+    'boost_unordered_map':    'Boost 1.51 unordered_map',
+    'stl_unordered_map':      'GCC 4.8 std::unordered_map',
+    'google_sparse_hash_map': 'Google sparsehash 1.10 sparse_hash_map',
+    'google_dense_hash_map':  'Google sparsehash 1.10 dense_hash_map',
+    'glib_hash_table':        'Glib 2.22 GHashTable',
+    'qt_qhash':               'Qt 4.6 QHash',
+    'python_dict':            'Python 2.6 (C API) dict',
+    'ruby_hash':              'Ruby Placeholder',
+    'sparsepp' :              'Sparse++',
+    'btree' :                 'Google cpp-btree'
 }
+
+proper_color = {
+    'google_sparse_hash_map': 0,
+    'google_dense_hash_map':  1,
+    'stl_unordered_map':      2,
+    'boost_unordered_map':    3,
+    'glib_hash_table':        6,
+    'qt_qhash':               7,
+    'python_dict':            8,
+    'ruby_hash':              9,
+    'sparsepp' :              4,
+    'btree' :                 5
+}
+
+bench_titles = {
+    'lookup':             'Random Lookup',
+    'sequential' :        'Sequential Insert',
+    'random' :            'Random Insert',
+    'delete' :            'Deletion',
+    'sequentialstring' :  'Sequential String Insert',
+    'randomstring' :      'Random String Insert',
+    'deletestring' :      'String Deletion'
+    }
 
 # do them in the desired order to make the legend not overlap the chart data
 # too much
 program_slugs = [
     'google_sparse_hash_map',
     'google_dense_hash_map',
+    'btree',
     'stl_unordered_map',
     'boost_unordered_map',
-    'python_dict',
-    'ruby_hash',
-    'glib_hash_table',
-    'qt_qhash',
+    'sparsepp'
 ]
 
 chart_data = {}
@@ -68,10 +93,47 @@ for i, (benchtype, programs) in enumerate(by_benchtype.items()):
         data = programs.get(program, [])
         chart_data[benchtype].append({
             'label': proper_names[program],
+            'color': proper_color[program],
             'data': [],
         })
 
         for k, (nkeys, value) in enumerate(data):
             chart_data[benchtype][-1]['data'].append([nkeys, value])
 
-print 'chart_data = ' + json.dumps(chart_data)
+html_chart_data = 'chart_data = ' + json.dumps(chart_data)
+
+## print chart_data['delete-runtime']
+
+html_plot_spec = ''
+for b in benches.keys():
+    html_plot_spec += """
+        $.plot($("#{0}-runtime"), chart_data['{0}-runtime'], runtime_settings);
+        $.plot($("#{0}-memory"),  chart_data['{0}-memory'],  memory_settings);""".format(b)
+
+html_div_spec = ''
+first = 1
+
+for b in benches.keys():
+    if 1:
+        first = 0
+        html_div_spec += """<h3>{1} : Memory Usage (integers)</h3>
+<div class="chart" id="{0}-memory"></div>
+<div class="xaxis-title">number of entries in hash table</div>
+
+""".format(b, bench_titles[b])
+
+    html_div_spec += """<h3>{1}: Execution Time (integers)</h3>
+<div class="chart" id="{0}-runtime"></div>
+<div class="xaxis-title">number of entries in hash table</div>
+
+""".format(b, bench_titles[b])
+
+
+
+html_template = file('charts-template.html', 'r').read()
+
+html_template = html_template.replace('__CHART_DATA_GOES_HERE__', html_chart_data)
+html_template = html_template.replace('__PLOT_SPEC_GOES_HERE__', html_plot_spec)
+html_template = html_template.replace('__PLOT_DIV_SPEC_GOES_HERE__', html_div_spec)
+
+file('charts.html', 'w').write(html_template)

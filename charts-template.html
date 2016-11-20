@@ -1,9 +1,15 @@
 <html>
     <head>
-        <!--[if IE]><script language="javascript" type="text/javascript" src="http://flot.googlecode.com/svn/trunk/excanvas.min.js"></script><![endif]-->
-        <script language="javascript" type="text/javascript" src="http://flot.googlecode.com/svn/trunk/jquery.js"></script>
-        <script language="javascript" type="text/javascript" src="http://flot.googlecode.com/svn/trunk/jquery.flot.js"></script>
+        <meta charset="utf-8">
+        <title>Hash Table Benchmarks</title>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="style.css" />
+        
+        <!--[if IE]><script language="javascript" type="text/javascript" src="js/excanvas.min.js"></script><![endif]-->
+        <script language="javascript" type="text/javascript" src="js/jquery.js"></script>
+        <script language="javascript" type="text/javascript" src="js/jquery.flot.js"></script>
     </head>
+
     <body>
 
 <script>
@@ -14,19 +20,23 @@
 
     grid_settings = { tickColor: '#ddd' };
 
+    divider = 10
+
     xaxis_settings = {
-        tickSize: 200000000,
-        tickFormatter: function(num, obj) { return parseInt(num/100000000) + '00M'; }
+        tickSize:      200000000 / divider,         <!-- 200000000 -->
+        tickFormatter: function(num, obj) { return parseInt(num/1000000) + 'M'; }
     };
 
     yaxis_runtime_settings = {
-        tickSize: 300,
+        labelWidth:    60,
+        tickSize:      300 / divider,                  <!--  -->
         tickFormatter: function(num, obj) { return num + ' sec.'; }
     };
 
     yaxis_memory_settings = {
-        tickSize: 10*1024*1024*1024,
-        tickFormatter: function(num, obj) { return parseInt(num/1024/1024/1024) + 'GiB'; }
+        labelWidth:    60,
+        tickSize:      10*1024*1024*1024 / divider,    <!-- 1024 -->
+        tickFormatter: function(num, obj) { return parseInt(num/1024/1024) + 'MB'; }
     };
 
     legend_settings = {
@@ -36,33 +46,32 @@
 
     runtime_settings = {
         series: series_settings,
-        grid: grid_settings,
-        xaxis: xaxis_settings,
-        yaxis: yaxis_runtime_settings,
+        grid:   grid_settings,
+        xaxis:  xaxis_settings,
+        yaxis:  yaxis_runtime_settings,
         legend: legend_settings
     };
 
     memory_settings = {
         series: series_settings,
-        grid: grid_settings,
-        xaxis: xaxis_settings,
-        yaxis: yaxis_memory_settings,
+        grid:   grid_settings,
+        xaxis:  xaxis_settings,
+        yaxis:  yaxis_memory_settings,
         legend: legend_settings
     };
 
     __CHART_DATA_GOES_HERE__
 
     $(function () {
-        $.plot($("#random-runtime"),     chart_data['random-runtime'],     runtime_settings);
-        $.plot($("#random-memory"),  chart_data['random-memory'],  memory_settings);
+        __PLOT_SPEC_GOES_HERE__
     });
 </script>
 
 <style>
     body, * { font-family: sans-serif; }
     div.chart {
-        width: 700px;
-        height: 230px;
+        width:  800px;
+        height: 500px;
     }
     div.xaxis-title {
         width: 700px;
@@ -73,15 +82,7 @@
     }
 </style>
 
-
-<h3>Random Inserts: Execution Time (integers)</h3>
-<div class="chart" id="random-runtime"></div>
-<div class="xaxis-title">number of entries in hash table</div>
-
-<h3>Memory Usage (Random Inserts: integers)</h3>
-<div class="chart" id="random-memory"></div>
-<div class="xaxis-title">number of entries in hash table</div>
-
+__PLOT_DIV_SPEC_GOES_HERE__
 
 </body>
 </html>
